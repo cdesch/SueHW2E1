@@ -1,13 +1,5 @@
 //
 //  main.cpp
-//  SueHW2E1
-//
-//  Created by cj on 9/11/14.
-//  Copyright (c) 2014 KickinEspresso. All rights reserved.
-//
-
-//
-//  main.cpp
 //  Lab 2 part 1
 //
 
@@ -85,9 +77,13 @@ Date::Date(string d){
     long dateValue = convertStringToLong(d);
     
     //break the dateValue into Year Month Day
-    //Hint use Modulus (%)
-    // dateValue % 10000
-    //TODO: Implement
+    int year = dateValue/10000;
+    int month = (dateValue/100) % 100;
+    int day = dateValue % 100;
+    
+    cout << "Year " << year << " " << " Month ";
+    if (month < 10) cout << "0" << month << "Day ";
+    if (day < 10) cout << "0" << day << endl;
     
 }
 
@@ -97,13 +93,12 @@ Date::~Date(){
 
 //Member Functions//
 void Date::printInfo(){
-    //FIX ME: Print in "YYYYMMDD" Format
-    //                  20140912 //Watch for the Leading  zero
+    int zero = 0;
     printf("Year: %d \n", year);
+    if(month < 10) printf("%d \n", zero);
     printf("Month: %d \n", month);
+    if(day < 10) printf("%d \n, zero");
     printf("Day: %d \n", day);
-    
-    //Hint: Print year, If month is less than 10, print a 0, then number.... if not print number
 }
 
 //GETTERS//
@@ -140,37 +135,49 @@ private:
     string firstName;
     long ssn;
     Date birthday;
+    
 public:
-
     //Constructor
-    Person(string last, string first, long s, Date b);
+    Person(long s, string first, string last, Date b);
     ~Person(); //Deconstructor
     
     //Member Functions//
     void printName();
     void printInfo(); //Print Name (first and last), SSN, Birthdate
     long age();     //Calculate the age of the person based on the birthdate
- 
+    
     //Setters
     //TODO Set/Get: lastName
     //TODO Set/Get: firstName
-    
     //TODO Set/Get: ssn
     //TODO Set/Get: Date
     //TODO setFullName(string name)
     
     //Getters are after this
     //TODO getFullName()
+    //GETTERS//
+    string getSsn();
+    string getFirstName;
+    string getLastName();
+    string getBirthday();
+    string setFullName(string fullname);
+    
+    //SETTERS//
+    
+    void setSsn(string s);
+    void setFirstName(string first);
+    void setLastName(string last);
+    void setBirthday(string b);
+    void setFullName(string fullname);
     
 };
 
 //Constructor with params
-Person::Person(string last, string first, long s, Date b){
-    lastName = last;
+Person::Person(long s, string first, string last, Date b){
+    ssn = s;
     firstName = first;
-    //TODO: assign ssn;
+    lastName = last;
     birthday = b;
-    
 }
 
 //Deconstructor
@@ -184,6 +191,9 @@ void Person::printName(){
 }
 
 //TODO void Person::printInfo(){}
+void Person::printInfo(int i){
+    person[i].printInfo();
+}
 
 long Person::age(){
     //This function computes the age to the nearest year.
@@ -195,6 +205,33 @@ long Person::age(){
 //TODO:Setters Implementation
 
 //TODO:Getters Implementation
+//Getters//
+string Person::getSsn(){
+    return ssn;
+}
+string Person::getFirstName(){
+    return first;
+}
+string Person::getLastName(){
+    return last;
+}
+string Person::getBirthday(){
+    return birthday;
+}
+
+//Setters//
+void Person::setSsn(string s){
+    ssn = s;
+}
+void Person::setFirstName(string first){
+    firstName = first;
+}
+void Person::setLastName(string last){
+    lastName = last;
+}
+void Person::setBirthday(birthday){
+    birthday=b;
+}
 
 //Notes:
 //I know I need to read in the file and get the YYYYMMDD string and then break it up into integers year=YYYY, month=MM, and day=DD
@@ -205,11 +242,11 @@ long Person::age(){
 
 vector <Person> readFile(string filename){
     vector <Person> people;
-
+    
     //Read each line, create object, add to people Vector  - Loop
     //use .push_back(MYOBJECT) on people Vector EX: people.push_back(MYOBJECT)
     //HINT: From Lab1E4 - instead of creating a book object, you will create a Person Object.... instead of a PersonStruct Object, you will create a date object.
-
+    
     return people;
 }
 
@@ -227,27 +264,3 @@ int main(int argc, const char * argv[]){
     return 0;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
