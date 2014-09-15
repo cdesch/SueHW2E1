@@ -13,7 +13,6 @@
 
 using namespace std;
 
-
 //This function converts a string to an integer
 //It returns a variable of type int
 int converStringToInt(string myString){
@@ -59,9 +58,9 @@ public:
 
 //Default Constructor
 Date::Date(){
-    this->year =  0;
-    this->month =  0;
-    this->day =  0;
+    this->year = 0;
+    this->month = 0;
+    this->day = 0;
 }
 
 //Constructor with params
@@ -77,7 +76,7 @@ Date::Date(string d){
     long dateValue = convertStringToLong(d);
     
     //break the dateValue into Year Month Day
-    int year = dateValue/10000;
+    int year = int(dateValue/10000);
     int month = (dateValue/100) % 100;
     int day = dateValue % 100;
     
@@ -92,13 +91,14 @@ Date::~Date(){
 }
 
 //Member Functions//
+//YYYYMMDD Format
 void Date::printInfo(){
     int zero = 0;
-    printf("Year: %d \n", year);
-    if(month < 10) printf("%d \n", zero);
-    printf("Month: %d \n", month);
-    if(day < 10) printf("%d \n, zero");
-    printf("Day: %d \n", day);
+    printf("%d", year);
+    if(month < 10) printf("%d", zero);
+    printf("%d", month);
+    if(day < 10) printf("%d", zero);
+    printf("%d\n", day);
 }
 
 //GETTERS//
@@ -122,8 +122,6 @@ void Date::setMonth(int m){
 void Date::setDay(int d){
     day = d;
 }
-
-
 
 //**************************
 //  Class Person
@@ -156,18 +154,18 @@ public:
     //Getters are after this
     //TODO getFullName()
     //GETTERS//
-    string getSsn();
-    string getFirstName;
+    long getSsn();
+    string getFirstName();
     string getLastName();
-    string getBirthday();
-    string setFullName(string fullname);
+    Date getBirthday();
+    string getFullName(string fullname);
     
     //SETTERS//
-    
-    void setSsn(string s);
+    void setSsn(long s);
     void setFirstName(string first);
     void setLastName(string last);
-    void setBirthday(string b);
+    void setBirthday(Date b);      //Overloaded!!
+    void setBirthday(string b);    //Overloaded!!
     void setFullName(string fullname);
     
 };
@@ -191,36 +189,42 @@ void Person::printName(){
 }
 
 //TODO void Person::printInfo(){}
-void Person::printInfo(int i){
-    person[i].printInfo();
+void Person::printInfo(){
+    printf("SSN: %ld \n", ssn);
+    printf("First Name: %s \n", firstName.c_str());
+    printf("Last Name: %s \n", lastName.c_str());
+    printf("Birthdate (YYYYMMDD): ");
+    birthday.printInfo();
+    printf("\n");
+    //Birthdate (YYYYMMDD): 20140914
 }
 
 long Person::age(){
     //This function computes the age to the nearest year.
-    //int age = 2014 - year;
-    //Hint: birthday.getYear();
-    return 0; //Implement
+    int age;
+    age = 2014 - int(birthday.getYear());
+    return age; //Implement
 }
 
 //TODO:Setters Implementation
 
 //TODO:Getters Implementation
 //Getters//
-string Person::getSsn(){
-    return ssn;
+long Person::getSsn(){
+    return ssn; //Type of long
 }
 string Person::getFirstName(){
-    return first;
+    return firstName;
 }
 string Person::getLastName(){
-    return last;
+    return lastName;
 }
-string Person::getBirthday(){
+Date Person::getBirthday(){
     return birthday;
 }
 
 //Setters//
-void Person::setSsn(string s){
+void Person::setSsn(long s){
     ssn = s;
 }
 void Person::setFirstName(string first){
@@ -229,33 +233,182 @@ void Person::setFirstName(string first){
 void Person::setLastName(string last){
     lastName = last;
 }
-void Person::setBirthday(birthday){
-    birthday=b;
+
+//Overloading -- two different means to the same end.
+void Person::setBirthday(Date b){
+     birthday = b;
 }
+void Person::setBirthday(string b){
+     birthday = Date(b);
+}
+
 
 //Notes:
 //I know I need to read in the file and get the YYYYMMDD string and then break it up into integers year=YYYY, month=MM, and day=DD
 //Need to read file and also need to modify this code, I think
 
+
+
 //ReadFile reads database and creates the objects
-
-
-vector <Person> readFile(string filename){
-    vector <Person> people;
-    
+vector <string> readFile(string filename){
+    vector <Person> people; //Vector of TYPE Person named 'people'
     //Read each line, create object, add to people Vector  - Loop
     //use .push_back(MYOBJECT) on people Vector EX: people.push_back(MYOBJECT)
     //HINT: From Lab1E4 - instead of creating a book object, you will create a Person Object.... instead of a PersonStruct Object, you will create a date object.
     
+    ifstream infile(filename); //Open the file
+    string str; //Declares a string and is used for temporary storage
+
+
+    int j = 0; //Line Index
+	if (infile.is_open()){
+		while (getline(infile,str, '\r')){
+            string ssnString;
+            string firstName;
+            string lastName;
+            string dateString;
+            
+            
+            string token;
+            stringstream stringStream(str);
+            //Get SSN
+            if (getline(stringStream, token, ' ')){
+                ssnString = token;
+            }
+            
+            if (getline(stringStream, token, ' ')){
+                firstName = token;
+            }
+            
+            if (getline(stringStream, token, ' ')){
+                lastName = token;
+            }
+            
+            if (getline(stringStream, token, ' ')){
+                dateString = token;
+            }
+            
+            cout << j << ": " << ssnString << " " << firstName << " " << lastName << " " << dateString << endl;
+                        j++;
+
+
+		}
+		infile.close();
+	}
+	else
+	{
+		cout << "Unable to open file" << endl << endl;
+	}
+
+
+    vector <string> db;
+    
+    
+    return db;
+}
+
+
+//ReadFile reads database and creates the objects
+vector <Person> parseDbStrings(vector <string> db){
+    vector <Person> people; //Vector of TYPE Person named 'people'
+    
+    for(int k = 0; k < db.size(); k++){
+        
+        //The first line is going to the title
+        string ssnString;
+        string firstName;
+        string lastName;
+        string dateString;
+        
+        //Copy the string into a vector of type "char" such that each character has it's own index
+        
+        int whitespaceindex = 0;
+        string mystring = db[k];
+        for (int i = 0; i < mystring.size(); i++){
+
+             if(mystring[i] == ' '){
+
+                 
+                 for (int j =0; j < i; j++){
+                     ssnString += mystring[j];
+                 }
+                 whitespaceindex = i+1;
+                 break;
+                 
+             }
+        }
+        
+        
+        for (int i = whitespaceindex; i < mystring.size(); i++){
+            
+            if(mystring[i] == ' '){
+                
+                for (int j = whitespaceindex; j < i; j++){
+                    firstName += mystring[j];
+                }
+                
+                whitespaceindex = i+1;
+                break;
+                
+            }
+        }
+        
+        for (int i = whitespaceindex; i < mystring.size(); i++){
+            
+            if(mystring[i] == ' '){
+                
+                for (int j = whitespaceindex; j < i; j++){
+                    lastName += mystring[j];
+                }
+                
+                whitespaceindex = i+1;
+                break;
+                
+            }
+        }
+        
+        for (int i = whitespaceindex; i < mystring.size(); i++){
+            
+            if(mystring[i] == ' '){
+                
+                for (int j = whitespaceindex; j < i; j++){
+                    dateString += mystring[j];
+                }
+                
+                whitespaceindex = i+1;
+                break;
+                
+            }
+        }
+        cout << mystring << endl;
+        //cout << ssnString << " " << firstName << " " << lastName << " " << dateString << endl;
+
+    }
+    
+    
     return people;
 }
+
+
+
 
 void labTwo(){
     cout << endl;
     cout <<"***************************************************"<< endl;
     cout << "  Reading file" << endl;
     cout <<"***************************************************"<< endl;
-    vector <Person> people = readFile("/Users/susanchang/Desktop/database1.txt");
+    vector <string> dbpeople = readFile("/Users/cj/Desktop/database1.txt");
+    //vector <Person> people = parseDbStrings(dbpeople);
+    
+    
+    /*
+    
+    //Check our work.
+    for(long i = 0; i < people.size(); i++){
+        people[i].printInfo();
+    }
+     */
+    
 }
 
 int main(int argc, const char * argv[]){
