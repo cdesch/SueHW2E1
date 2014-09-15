@@ -76,14 +76,13 @@ Date::Date(string d){
     long dateValue = convertStringToLong(d);
     
     //break the dateValue into Year Month Day
-    int year = int(dateValue/10000);
-    int month = (dateValue/100) % 100;
-    int day = dateValue % 100;
+    year = int(dateValue/10000);
+    month = (dateValue/100) % 100;
+    day = dateValue % 100;
     
-    cout << "Year " << year << " " << " Month ";
-    if (month < 10) cout << "0" << month << "Day ";
-    if (day < 10) cout << "0" << day << endl;
-    
+    //cout << "Year " << year << " " << " Month ";
+    //if (month < 10) cout << "0" << month << "Day ";
+    //if (day < 10) cout << "0" << day << endl;
 }
 
 //Deconstructor
@@ -159,6 +158,7 @@ public:
     string getLastName();
     Date getBirthday();
     string getFullName(string fullname);
+
     
     //SETTERS//
     void setSsn(long s);
@@ -195,7 +195,6 @@ void Person::printInfo(){
     printf("Last Name: %s \n", lastName.c_str());
     printf("Birthdate (YYYYMMDD): ");
     birthday.printInfo();
-    printf("\n");
     //Birthdate (YYYYMMDD): 20140914
 }
 
@@ -206,9 +205,6 @@ long Person::age(){
     return age; //Implement
 }
 
-//TODO:Setters Implementation
-
-//TODO:Getters Implementation
 //Getters//
 long Person::getSsn(){
     return ssn; //Type of long
@@ -250,7 +246,7 @@ void Person::setBirthday(string b){
 
 
 //ReadFile reads database and creates the objects
-vector <string> readFile(string filename){
+vector <Person> readFile(string filename){
     vector <Person> people; //Vector of TYPE Person named 'people'
     //Read each line, create object, add to people Vector  - Loop
     //use .push_back(MYOBJECT) on people Vector EX: people.push_back(MYOBJECT)
@@ -259,15 +255,12 @@ vector <string> readFile(string filename){
     ifstream infile(filename); //Open the file
     string str; //Declares a string and is used for temporary storage
 
-
-    int j = 0; //Line Index
 	if (infile.is_open()){
 		while (getline(infile,str, '\r')){
             string ssnString;
             string firstName;
             string lastName;
             string dateString;
-            
             
             string token;
             stringstream stringStream(str);
@@ -288,128 +281,146 @@ vector <string> readFile(string filename){
                 dateString = token;
             }
             
-            cout << j << ": " << ssnString << " " << firstName << " " << lastName << " " << dateString << endl;
-                        j++;
-
-
+            
+            //Date Object
+            Date birthdayVariable(dateString); //Creates a new date object
+            
+            //Person     Person(long s, string first, string last, Date b);
+            long ssn = convertStringToLong(ssnString);
+            Person personVariable(ssn, firstName, lastName, birthdayVariable);
+            people.push_back(personVariable);
+            
 		}
 		infile.close();
+        
 	}
-	else
-	{
+	else{
 		cout << "Unable to open file" << endl << endl;
 	}
-
-
-    vector <string> db;
-    
-    
-    return db;
-}
-
-
-//ReadFile reads database and creates the objects
-vector <Person> parseDbStrings(vector <string> db){
-    vector <Person> people; //Vector of TYPE Person named 'people'
-    
-    for(int k = 0; k < db.size(); k++){
-        
-        //The first line is going to the title
-        string ssnString;
-        string firstName;
-        string lastName;
-        string dateString;
-        
-        //Copy the string into a vector of type "char" such that each character has it's own index
-        
-        int whitespaceindex = 0;
-        string mystring = db[k];
-        for (int i = 0; i < mystring.size(); i++){
-
-             if(mystring[i] == ' '){
-
-                 
-                 for (int j =0; j < i; j++){
-                     ssnString += mystring[j];
-                 }
-                 whitespaceindex = i+1;
-                 break;
-                 
-             }
-        }
-        
-        
-        for (int i = whitespaceindex; i < mystring.size(); i++){
-            
-            if(mystring[i] == ' '){
-                
-                for (int j = whitespaceindex; j < i; j++){
-                    firstName += mystring[j];
-                }
-                
-                whitespaceindex = i+1;
-                break;
-                
-            }
-        }
-        
-        for (int i = whitespaceindex; i < mystring.size(); i++){
-            
-            if(mystring[i] == ' '){
-                
-                for (int j = whitespaceindex; j < i; j++){
-                    lastName += mystring[j];
-                }
-                
-                whitespaceindex = i+1;
-                break;
-                
-            }
-        }
-        
-        for (int i = whitespaceindex; i < mystring.size(); i++){
-            
-            if(mystring[i] == ' '){
-                
-                for (int j = whitespaceindex; j < i; j++){
-                    dateString += mystring[j];
-                }
-                
-                whitespaceindex = i+1;
-                break;
-                
-            }
-        }
-        cout << mystring << endl;
-        //cout << ssnString << " " << firstName << " " << lastName << " " << dateString << endl;
-
-    }
-    
     
     return people;
 }
 
 
+void printPeopleVector(vector<Person> people){
+    //Check our work by printing the information for the vector of people objects
+    for(long i = 0; i < people.size(); i++){
+        cout << i << ": " ;
+        people[i].printInfo();
+        cout << "Age: " << people[i].age() << endl << endl;
+    }
+}
 
+
+void printAgeOfPeopleVector(vector<Person> people){
+    //Check our work by printing the information for the vector of people objects
+    for(long i = 0; i < people.size(); i++){
+        cout << i << ": " <<  people[i].age() << endl;
+    }
+}
+
+
+
+//TODO: change 'vector <int>' to 'vector <Person>' because we are sorting people.
+//TODO: When comparing people, call the .age()  -- Ex: myArray[i].age();  //Only during comparison
+vector <int> bubbleSort(vector <int> myArray){
+    //Loop through
+    //Compare what ? if larger : swap ...
+    for(int loop = 1; loop <myArray.size(); loop++ ){
+        for(int i = 1 ; i <myArray.size(); i++){
+            
+            if(myArray[i-1] > myArray[i]){
+                //Swap
+                int temp = myArray[i];
+                myArray[i] = myArray[i-1];
+                myArray[i-1] = temp;
+            }
+        }
+    }
+    return myArray;
+}
+
+vector <int> insertionSort(vector <int> myArray){
+    for(int i = 0; i <= myArray.size(); i++ ){
+        for(int j = i - 1 ; j > 0; j--){
+            if(myArray[j-1] > myArray[j]){
+                //Swap
+                int temp = myArray[j];
+                myArray[j] = myArray[j-1];
+                myArray[j-1] = temp;
+            }
+        }
+    }
+    return myArray;
+}
+
+vector <int> selectionSort(vector <int> myArray){
+    int i, j, smallestNow;
+    for(i=0; i<myArray.size()-1; i++){
+        smallestNow = i;
+        for(j=i+1; j<myArray.size(); j++){
+            if(myArray[smallestNow] > myArray[j]) smallestNow=j;
+        }
+        int temp = myArray[i];
+        myArray[i] = myArray[smallestNow];
+        myArray[smallestNow] = temp;
+    }
+    return myArray;
+}
+
+vector <int> shakerSort(vector <int> myArray){
+    for(int i=0; i<=myArray.size()/2; i++){
+        for(int j=i; j<(myArray.size())-(i+1); j++){
+            if(myArray[j] > myArray[j+1]){
+                //Swap
+                int temp = myArray[j];
+                myArray[j] = myArray[j+1];
+                myArray[j+1] = temp;
+            }
+        }
+        for(int j= int(myArray.size()-(2+i)); j > i; j--){
+            if(myArray[j] < myArray[j-1]){
+                int temp = myArray[j];
+                myArray[j] = myArray[j-1];
+                myArray[j-1]=temp;
+            }
+        }
+    }
+    return myArray;
+}
 
 void labTwo(){
     cout << endl;
     cout <<"***************************************************"<< endl;
     cout << "  Reading file" << endl;
     cout <<"***************************************************"<< endl;
-    vector <string> dbpeople = readFile("/Users/cj/Desktop/database1.txt");
-    //vector <Person> people = parseDbStrings(dbpeople);
+    vector <Person> peopleVectorDB1 = readFile("/Users/cj/Desktop/database1.txt");
+    
+    printPeopleVector(peopleVectorDB1);
+    
+    //Timer Start
+    //vector <Person> bubbleSortedPeopleVector = bubbleSort(peopleVectorDB1);
+    //Timer Stop
+    //printPeopleVector(bubbleSortedPeopleVector);
+    //Print timer Results
     
     
-    /*
+    //vector <Person> selectionSortedPeopleVector = selectionSort(peopleVectorDB1);
+    //printPeopleVector(selectionSortedPeopleVector);
     
-    //Check our work.
-    for(long i = 0; i < people.size(); i++){
-        people[i].printInfo();
-    }
-     */
+    
+    //printAgeOfPeopleVector(peopleVectorDB1);
+    
     
 }
+
+
+//Test Prep List
+// 1 sort of the 4 - comparison sort analysis.
+// variable scope
+// function based question (parameters)
+// Class based question
+//
 
 int main(int argc, const char * argv[]){
     cout << "Lab 2, Part 1 \n";
