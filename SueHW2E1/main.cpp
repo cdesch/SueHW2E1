@@ -160,11 +160,7 @@ public:
     long age();     //Calculate the age of the person based on the birthdate
     
     //Setters and Getters
-    //TODO Set/Get: lastName
-    //TODO Set/Get: firstName
-    //TODO Set/Get: ssn
-    //TODO Set/Get: Date
-    //TODO setFullName(string name)
+
     
     //GETTERS//
     long getSsn();
