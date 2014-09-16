@@ -13,6 +13,9 @@
 #include <sstream>
 
 using namespace std;
+//              {0,                 1,                          2,          3};
+enum SortType {SelectionSortType, InsertionSortType, BubbleSortType, ShakerSortType};
+
 
 //This function converts a string to an integer
 //It returns a variable of type int
@@ -38,10 +41,11 @@ long convertStringToLong(string myString){
             //If it is not a digit, remove it
             if (!isdigit(myString[i])){
                 cout << " <--  ***** Not a integer *****" ;
+                
             }
             cout << endl;
         }
-        throw  "***Error Reading File. Remove Unicode Bytes from first line";
+        //throw  "***Error Reading File. Remove Unicode Bytes from first line";
         string newString = myString.substr(3);
         convertedNumber = atol(newString.c_str());
     }
@@ -390,54 +394,116 @@ double getCPUTime(void) {
     return t;
 }
 
-void labTwo(){
+//Results should look like this
+//Print 1000 SelectAve  InsertAve BubbleAve ShakerAve
+//Print 2000 SelectAve  InsertAve BubbleAve ShakerAve
+//Print 3000 SelectAve  InsertAve BubbleAve ShakerAve
+//Print 5000 SelectAve  InsertAve BubbleAve ShakerAve
+//Print 10000 SelectAve  InsertAve BubbleAve ShakerAve
+//Print 20000 SelectAve  InsertAve BubbleAve ShakerAve
+
+void runSort(vector<Person> people, SortType sortType){
+    
+    //
+
     double startTime, endTime, totalTime;
+    
+    double average = 0;
+    int numberOfRuns = 3;
+    for(int i = 0; i< numberOfRuns; i++){
+        startTime = getCPUTime();
+        
+        switch (sortType) {
+            case SelectionSortType:
+                //Our Code Goes here for Selection Sort
+                //cout << "Selection Sort: " << endl;
+                selectionSort(people);
+                break;
+                
+            case InsertionSortType:
+                //cout << "Insertion Sort: " << endl;
+                insertionSort(people);
+                break;
+            case BubbleSortType:
+                //cout << "Bubble Sort: " << endl;
+                bubbleSort(people);
+                break;
+                
+            case ShakerSortType:
+                //cout << "Shaker Sort: " << endl;
+                shakerSort(people);
+                break;
+                
+            default:
+                //This gets trigger if SortType
+                
+                break;
+        }
+        endTime = getCPUTime();
+        totalTime = endTime - startTime;
+        average += totalTime;
+    }
+    
+    average = average / numberOfRuns;
+    cout << "Average Time for ";
+    switch (sortType) {
+        case SelectionSortType:
+            cout << "Selection Sort ";
+            break;
+            
+        case InsertionSortType:
+            cout << "Insertion Sort ";
+            break;
+        case BubbleSortType:
+            cout << "Bubble Sort ";
+            break;
+        case ShakerSortType:
+            cout << "Shaker Sort ";
+            break;
+            
+        default:
+            //This gets trigger if SortType
+            
+            break;
+    }
+    cout << "is " << average << " for "<< people.size() <<  " records." << endl;
+    
+}
+
+void runAllSortsForDatabase(vector<Person> people){
+    
+    cout << "** Running sorts for " << people.size() << " records." << endl;
+    runSort(people, SelectionSortType);
+    runSort(people, InsertionSortType);
+    runSort(people, BubbleSortType);
+    runSort(people, ShakerSortType);
+}
+
+void labTwoExercise1(vector <Person> people){
+
+    //Print Statements
+}
+
+
+void labTwo(){
+
     cout << endl;
     cout <<"***************************************************"<< endl;
     cout << "  Reading file" << endl;
     cout <<"***************************************************"<< endl;
+
+    vector <Person> peopleVectorDB1 = readFile("/Users/cj/Desktop/database1.txt");
+    vector <Person> peopleVectorDB3 = readFile("/Users/cj/Desktop/database3.txt");
+    vector <Person> peopleVectorDB5 = readFile("/Users/cj/Desktop/database5.txt");
+    vector <Person> peopleVectorDB10 = readFile("/Users/cj/Desktop/database10.txt");
+    vector <Person> peopleVectorDB20 = readFile("/Users/cj/Desktop/database20.txt");
     
-    vector <Person> peopleVectorDB1 = readFile("/Users/cj/Desktop/database2.txt");
-    
-    printPeopleVector(peopleVectorDB1);
-    
-    cout << "Timing Output for Four Sort Algorithms: \n \n";
-    cout << "Bubble Sort: " << endl;
-    startTime = getCPUTime();
-    vector <Person> bubbleSortedPeopleVector = bubbleSort(peopleVectorDB1);
-    endTime = getCPUTime();
-    totalTime = endTime - startTime;
-    //printPeopleVector(bubbleSortedPeopleVector);
-    cout << "Total time: " << totalTime << " = End time: " << endTime << " - Start time: " << startTime << endl;
-    
-    cout << endl;
-    cout << "Insertion Sort: " << endl;
-    startTime = getCPUTime();
-    vector <Person> insertionSortedPeopleVector = insertionSort(peopleVectorDB1);
-    endTime = getCPUTime();
-    totalTime = endTime - startTime;
-    //printPeopleVector(insertionSortedPeopleVector);
-    cout << "Total time: " << totalTime << " = End time: " << endTime << " - Start time: " << startTime << endl;
-    
-    cout << endl;
-    cout << "Selection Sort: " << endl;
-    startTime = getCPUTime();
-    vector <Person> selectionSortedPeopleVector = selectionSort(peopleVectorDB1);
-    endTime = getCPUTime();
-    totalTime = endTime - startTime;
-    //printPeopleVector(selectionSortedPeopleVector);
-    cout << "Total time: " << totalTime << " = End time: " << endTime << " - Start time: " << startTime << endl;
-    
-    cout << endl;
-    cout << "Shaker Sort: " << endl;
-    startTime = getCPUTime();
-    vector <Person> shakerSortedPeopleVector = shakerSort(peopleVectorDB1);
-    endTime = getCPUTime();
-    totalTime = endTime - startTime;
-    cout <<endl;
-    printPeopleVector(shakerSortedPeopleVector);
-    //printPeopleVector(shakerSortedPeopleVector);
-    cout << "Total time: " << totalTime << " = End time: " << endTime << " - Start time: " << startTime << endl;
+    runAllSortsForDatabase(peopleVectorDB1);
+    runAllSortsForDatabase(peopleVectorDB3);
+    runAllSortsForDatabase(peopleVectorDB5);
+    runAllSortsForDatabase(peopleVectorDB10);
+    runAllSortsForDatabase(peopleVectorDB20);
+
 }
 
 int main(int argc, const char * argv[]){
