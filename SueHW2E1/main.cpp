@@ -298,6 +298,57 @@ vector <Person> readFile(string filename){
     return people;
 }
 
+//ReadFile reads database and creates the objects
+vector <Person> readFileByLine(string filename){
+    vector <Person> people; //Vector of TYPE Person named 'people'
+    
+    ifstream infile(filename); //Open the file
+    string str; //Declares a string and is used for temporary storage
+    
+	if (infile.is_open()){
+		while (getline(infile,str)){
+            string ssnString;
+            string firstName;
+            string lastName;
+            string dateString;
+            
+            string token;
+            stringstream stringStream(str);
+            //Get SSN
+            if (getline(stringStream, token, ' ')){
+                ssnString = token;
+            }
+            
+            if (getline(stringStream, token, ' ')){
+                firstName = token;
+            }
+            
+            if (getline(stringStream, token, ' ')){
+                lastName = token;
+            }
+            
+            if (getline(stringStream, token, ' ')){
+                dateString = token;
+            }
+            
+            //Date Object
+            Date birthdayVariable(dateString); //Creates a new date object
+            //Person     Person(long s, string first, string last, Date b);
+            long ssn =  convertStringToLong(ssnString);
+            
+            Person personVariable(ssn, firstName, lastName, birthdayVariable);
+            people.push_back(personVariable);
+		}
+		infile.close();
+	}
+	else{
+		cout << "Unable to open file" << endl << endl;
+	}
+    return people;
+}
+
+
+
 void printPeopleVector(vector<Person> people){
     //Check our work by printing the information for the vector of people objects
     for(long i = 0; i < people.size(); i++){
@@ -484,7 +535,6 @@ void labTwoExercise1(vector <Person> people){
     //Print Statements
 }
 
-
 void labTwo(){
 
     cout << endl;
@@ -493,17 +543,21 @@ void labTwo(){
     cout <<"***************************************************"<< endl;
 
     vector <Person> peopleVectorDB1 = readFile("/Users/cj/Desktop/database1.txt");
+    vector <Person> peopleVectorDB2 = readFileByLine("/Users/cj/Desktop/database2.txt");
     vector <Person> peopleVectorDB3 = readFile("/Users/cj/Desktop/database3.txt");
     vector <Person> peopleVectorDB5 = readFile("/Users/cj/Desktop/database5.txt");
     vector <Person> peopleVectorDB10 = readFile("/Users/cj/Desktop/database10.txt");
     vector <Person> peopleVectorDB20 = readFile("/Users/cj/Desktop/database20.txt");
     
+    printPeopleVector(peopleVectorDB2);
+    
+    /*
     runAllSortsForDatabase(peopleVectorDB1);
     runAllSortsForDatabase(peopleVectorDB3);
     runAllSortsForDatabase(peopleVectorDB5);
     runAllSortsForDatabase(peopleVectorDB10);
     runAllSortsForDatabase(peopleVectorDB20);
-
+*/
 }
 
 int main(int argc, const char * argv[]){
