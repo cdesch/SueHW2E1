@@ -16,6 +16,8 @@ using namespace std;
 //              {0,                 1,                          2,          3};
 enum SortType {SelectionSortType, InsertionSortType, BubbleSortType, ShakerSortType};
 
+
+
 int randomNumberUnder(unsigned long maxVal){
     return  rand() % maxVal;
 }
@@ -731,17 +733,32 @@ vector <double> runGranularSorts(vector <Person> people, SortType sortType, int 
     double runTime;
     
     while (people.size() > reduceAmount +1){
-        
         runTime = runTimedSort(people, sortType);
         sizes.push_back(people.size());
         results.push_back(runTime);
         people = reduceVectorSize(people, reduceAmount);
-        
     }
     
     
     return results;
     
+}
+void printProgBar( int percent ){
+    string bar;
+    
+    for(int i = 0; i < 50; i++){
+        if( i < (percent/2)){
+            bar.replace(i,1,"=");
+        }else if( i == (percent/2)){
+            bar.replace(i,1,">");
+        }else{
+            bar.replace(i,1," ");
+        }
+    }
+    
+    cout<< "\r" "[" << bar << "] ";
+    cout.width( 3 );
+    cout<< percent << "%     " << std::flush;
 }
 
 void printVectorSizes(vector <Person> people,  int reduceAmount){
@@ -751,7 +768,6 @@ void printVectorSizes(vector <Person> people,  int reduceAmount){
         sizes.push_back(people.size());
         people = reduceVectorSize(people, reduceAmount);
     }
-
     for (int i = (int)sizes.size() - 1; i > 0 ; i--){
         cout << sizes[i] << "\t";
     }
@@ -829,6 +845,7 @@ void runAllSortTypeGranular(vector<Person> people, bool isMultiThreaded){
         insertionThread.join();
         bubbleThread.join();
         shakerThread.join();
+        
     }else{
         //Single Threaded
         runAllCasesGranular(people, SelectionSortType);
@@ -914,8 +931,8 @@ int main(int argc, const char * argv[]){
     cout << "Lab 2, Parts 1, 2, and Extra Credit \n";
     //labTwo();
     
-//    runGranularAlgoDebug();
-    testSort();
+    runGranularAlgoDebug();
+    //testSort();
     return 0;
 }
 
