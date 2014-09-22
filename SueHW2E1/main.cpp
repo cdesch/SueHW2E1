@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <sstream>
 #include <thread>
+
 using namespace std;
 //              {0,                 1,                          2,          3};
 enum SortType {SelectionSortType, InsertionSortType, BubbleSortType, ShakerSortType};
@@ -202,7 +203,6 @@ Person::Person(long s, string first, string last, Date b){
 
 //Deconstructor
 Person::~Person(){
-    
 }
 
 //Member Functions//
@@ -258,6 +258,46 @@ void Person::setBirthday(Date b){
 void Person::setBirthday(string b){
     birthday = Date(b);
 }
+
+//Sort Class
+
+class Sort{
+    
+public:
+    //Attributes
+    vector<Person> people;
+    SortType sortType;
+    double progress;
+    double totalWorkToBeDone;
+    double currentPointInWork;
+    //Constructor
+    Sort(); //Default
+    Sort(vector<Person> people, SortType sortType);
+    ~Sort(); //Deconstructor
+    
+    
+};
+//Default constructor
+Sort::Sort(){
+    this->progress = 0;
+    this->totalWorkToBeDone = 0;
+    this->currentPointInWork = 0;
+}
+//
+Sort::Sort(vector<Person> people, SortType sortType){
+    this->people = people;
+    this->sortType = sortType;
+    
+    this->progress = 0;
+    this->totalWorkToBeDone = 0;
+    this->currentPointInWork = 0;
+
+}
+
+Sort::~Sort(){
+    this->people.clear();
+}
+
 
 //ReadFile reads database and creates the objects
 vector <Person> readFile(string filename){
@@ -409,15 +449,16 @@ vector <Person> selectionSort(vector <Person> myArray){
  */
 
 vector <Person> insertionSort(vector <Person> myArray){
-    for(int i = 1; i < myArray.size(); i++){
-        int j=i;
-        while(j > 0 && myArray[j].age() < myArray[j-1].age()){
+    for(int i = 0; i < myArray.size()-1; i++){
+        int j=i +1;
+
+        Person temp = myArray[j];
+        while(j > 0 && temp.age() > myArray[j-1].age()){
             //Swap
-            Person temp = myArray[j];
             myArray[j] = myArray[j-1];
-            myArray[j-1] = temp;
             j--;
         }
+        myArray[j-1] = temp;
     }
     return myArray;
 }
@@ -426,13 +467,13 @@ vector <Person> insertionSort(vector <Person> myArray){
 vector <Person> bubbleSort(vector <Person> myArray){
     //Loop through
     //Compare and swap ...
-    for(int loop = 1; loop <myArray.size(); loop++ ){
-        for(int i = 1 ; i <myArray.size(); i++){
-            if(myArray[i-1].age() > myArray[i].age()){
+    for(int loop = 0; loop < myArray.size()-1; loop++ ){
+        for(int i = 0 ; i <myArray.size() - loop - 1; i++){
+            if(myArray[i+1].age() > myArray[i].age()){
                 //Swap
                 Person temp = myArray[i];
-                myArray[i] = myArray[i-1];
-                myArray[i-1] = temp;
+                myArray[i] = myArray[i+1];
+                myArray[i+1] = temp;
             }
         }
     }
@@ -442,20 +483,26 @@ vector <Person> bubbleSort(vector <Person> myArray){
 //Shaker Sort
 vector <Person> shakerSort(vector <Person> myArray){
     for(int i=0; i<=myArray.size()/2; i++){
-        for(int j=i; j<(myArray.size())-(i+1); j++){
+        bool swapped = false;
+        for(int j=i; j<(myArray.size() -i -1); j++){
             if(myArray[j].age() > myArray[j+1].age()){
                 //Swap
                 Person temp = myArray[j];
                 myArray[j] = myArray[j+1];
                 myArray[j+1] = temp;
+                swapped = true;
             }
         }
-        for(int j= int(myArray.size()-(2+i)); j > i; j--){
+        for(int j= int(myArray.size()-2-i); j > i; j--){
             if(myArray[j].age() < myArray[j-1].age()){
                 Person temp = myArray[j];
                 myArray[j] = myArray[j-1];
                 myArray[j-1]=temp;
+                swapped = true;
             }
+        }
+        if(!swapped){
+            break;
         }
     }
     return myArray;
@@ -727,22 +774,6 @@ void runAllSortsForDatabaseForAveBestWorst(vector<Person> people){
     runSortAveBestWorst(people, ShakerSortType);
 }
 
-vector <double> runGranularSorts(vector <Person> people, SortType sortType, int reduceAmount){
-    vector<double> sizes;
-    vector<double> results;
-    double runTime;
-    
-    while (people.size() > reduceAmount +1){
-        runTime = runTimedSort(people, sortType);
-        sizes.push_back(people.size());
-        results.push_back(runTime);
-        people = reduceVectorSize(people, reduceAmount);
-    }
-    
-    
-    return results;
-    
-}
 void printProgBar( int percent ){
     string bar;
     
@@ -755,10 +786,34 @@ void printProgBar( int percent ){
             bar.replace(i,1," ");
         }
     }
-    
     cout<< "\r" "[" << bar << "] ";
     cout.width( 3 );
     cout<< percent << "%     " << std::flush;
+}
+
+
+int calcPercentage(float num,float dom){
+    
+    return (int) (num/dom) * 100;
+}
+
+vector <double> runGranularSorts(vector <Person> people, SortType sortType, int reduceAmount, int numIterations){
+    vector<double> sizes;
+    vector<double> results;
+    double runTime;
+    int i = 0;
+    while (people.size() > reduceAmount +1){
+        runTime = runTimedSort(people, sortType);
+        sizes.push_back(people.size());
+        results.push_back(runTime);
+        people = reduceVectorSize(people, reduceAmount);
+        i++;
+        //printProgBar(calcPercentage((float)i,(float)numIterations));
+        //cout << i << "/" << numIterations << endl;
+    }
+    
+    return results;
+    
 }
 
 void printVectorSizes(vector <Person> people,  int reduceAmount){
@@ -772,6 +827,19 @@ void printVectorSizes(vector <Person> people,  int reduceAmount){
         cout << sizes[i] << "\t";
     }
     cout << endl;
+
+}
+
+int getVectorSizes(vector <Person> people,  int reduceAmount){
+    
+    vector<double> sizes;
+    while (people.size() > reduceAmount +1){
+        sizes.push_back(people.size());
+        people = reduceVectorSize(people, reduceAmount);
+    }
+
+    cout << endl;
+    return (int)sizes.size();
 }
 
 
@@ -813,15 +881,16 @@ void runAllCasesGranular(vector<Person> people, SortType sortType){
     int reduceAmount = 500;
 
     //Run Ave Case
-
-    vector <double> aveCaseResults = runGranularSorts(people, sortType, reduceAmount);
+    int numIterations = getVectorSizes(people, reduceAmount);
+    
+    vector <double> aveCaseResults = runGranularSorts(people, sortType, reduceAmount, numIterations);
     //Run Best Case
     vector<Person>bestCase = selectionSort(people);
-    vector <double> bestCaseResults = runGranularSorts(people, sortType, reduceAmount);
+    vector <double> bestCaseResults = runGranularSorts(people, sortType, reduceAmount, numIterations);
 
     //run Worst Case
     vector<Person>worstCase = reversePeopleVector(bestCase);
-    vector <double> worstCaseResults = runGranularSorts(worstCase, sortType, reduceAmount);
+    vector <double> worstCaseResults = runGranularSorts(worstCase, sortType, reduceAmount, numIterations);
     
     printSortName(sortType);
     printVectorSizes(people, reduceAmount);
@@ -848,10 +917,10 @@ void runAllSortTypeGranular(vector<Person> people, bool isMultiThreaded){
         
     }else{
         //Single Threaded
-        runAllCasesGranular(people, SelectionSortType);
-        runAllCasesGranular(people, InsertionSortType);
-        runAllCasesGranular(people, BubbleSortType);
-        runAllCasesGranular(people, ShakerSortType);
+        //runAllCasesGranular(people, SelectionSortType);
+        //runAllCasesGranular(people, InsertionSortType);
+        //runAllCasesGranular(people, BubbleSortType);
+        //runAllCasesGranular(people, ShakerSortType);
 
     }
 }
