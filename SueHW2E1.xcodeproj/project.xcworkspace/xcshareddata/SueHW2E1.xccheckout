@@ -10,29 +10,29 @@
 	<string>SueHW2E1</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>40004237-F49E-4B19-9668-8EAE0B8E8A31</key>
+		<key>4FE8967F0D7D8F68EB72E2803DE63E6EDF63D112</key>
 		<string>ssh://github.com/cdesch/SueHW2E1.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>SueHW2E1.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>40004237-F49E-4B19-9668-8EAE0B8E8A31</key>
+		<key>4FE8967F0D7D8F68EB72E2803DE63E6EDF63D112</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>ssh://github.com/cdesch/SueHW2E1.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>40004237-F49E-4B19-9668-8EAE0B8E8A31</string>
+	<string>4FE8967F0D7D8F68EB72E2803DE63E6EDF63D112</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>40004237-F49E-4B19-9668-8EAE0B8E8A31</string>
+			<string>4FE8967F0D7D8F68EB72E2803DE63E6EDF63D112</string>
 			<key>IDESourceControlWCCName</key>
 			<string>SueHW2E1</string>
 		</dict>

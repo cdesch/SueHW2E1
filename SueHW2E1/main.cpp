@@ -17,6 +17,10 @@ using namespace std;
 enum SortType {SelectionSortType, InsertionSortType, BubbleSortType, ShakerSortType};
 
 
+int randomNumberUnder(unsigned long maxVal){
+    return  rand() % maxVal;
+}
+
 //This function converts a string to an integer
 //It returns a variable of type int
 int converStringToInt(string myString){
@@ -33,7 +37,8 @@ long convertStringToLong(string myString){
     convertedNumber = atol(myString.c_str());
     //Check if conversion failed
     if (convertedNumber == 0){
-        cout << "***Error: Conversion to long Failed. Unicode bytes detected in Data File." << endl;
+        cout << "***Error: Conversion to long Failed. Unicode bytes " << endl;
+        cout << "***       detected in Data File." << endl;
         cout << "***Error Reading File. Remove Unicode Bytes in Data File." << endl;
         for (int i = 0; i < myString.length(); i++){
             //cout << i << ": " << myString[i] << " ";
@@ -105,6 +110,8 @@ Date::Date(string d){
 
 //Deconstructor
 Date::~Date(){
+
+    
 }
 
 //Member Functions//
@@ -153,6 +160,7 @@ private:
     
 public:
     //Constructor
+    Person(); //Default Constructor
     Person(long s, string first, string last, Date b);
     ~Person(); //Deconstructor
     
@@ -178,6 +186,10 @@ public:
     void setBirthday(string b);    //Overloaded!!
     void setFullName(string fullname);
 };
+ //Default Constructor
+Person::Person(){
+    
+}
 
 //Constructor with params
 Person::Person(long s, string first, string last, Date b){
@@ -189,6 +201,7 @@ Person::Person(long s, string first, string last, Date b){
 
 //Deconstructor
 Person::~Person(){
+    
 }
 
 //Member Functions//
@@ -252,8 +265,8 @@ vector <Person> readFile(string filename){
     ifstream infile(filename); //Open the file
     string str; //Declares a string and is used for temporary storage
     
-	if (infile.is_open()){
-		while (getline(infile,str, '\r')){
+    if (infile.is_open()){
+        while (getline(infile,str, '\r')){
             string ssnString;
             string firstName;
             string lastName;
@@ -285,12 +298,12 @@ vector <Person> readFile(string filename){
             
             Person personVariable(ssn, firstName, lastName, birthdayVariable);
             people.push_back(personVariable);
-		}
-		infile.close();
-	}
-	else{
-		cout << "Unable to open file" << endl << endl;
-	}
+        }
+        infile.close();
+    }
+    else{
+        cout << "Unable to open file" << endl << endl;
+    }
     return people;
 }
 
@@ -302,15 +315,15 @@ vector <Person> readFileByLine(string filename){
     ifstream infile(filename); //Open the file
     string str; //Declares a string and is used for temporary storage
     
-	if (infile.is_open()){
-		while (getline(infile,str)){
+    if (infile.is_open()){
+        while (getline(infile,str)){
             string ssnString;
             string firstName;
             string lastName;
             string dateString;
-            
             string token;
             stringstream stringStream(str);
+            
             //Get SSN
             if (getline(stringStream, token, ' ')){
                 ssnString = token;
@@ -335,15 +348,14 @@ vector <Person> readFileByLine(string filename){
             
             Person personVariable(ssn, firstName, lastName, birthdayVariable);
             people.push_back(personVariable);
-		}
-		infile.close();
-	}
-	else{
-		cout << "Unable to open file" << endl << endl;
-	}
+        }
+        infile.close();
+    }
+    else{
+        cout << "Unable to open file" << endl << endl;
+    }
     return people;
 }
-
 
 void printPeopleVector(vector<Person> people){
     //Check work by printing the information for the vector of people objects
@@ -360,6 +372,54 @@ void printAgeOfPeopleVector(vector<Person> people){
         cout << i << ": " <<  people[i].age() << endl;
     }
 }
+vector <Person> selectionSort(vector <Person> myArray){
+    int i, j, smallestNow;
+    for(i=0; i < myArray.size()-1; i++){
+        smallestNow=i;
+        for(j=i+1; j < myArray.size(); j++){
+            if(myArray[j].age()< myArray[smallestNow].age()){
+                smallestNow=j;
+            }
+        }
+        if(smallestNow != i){
+            Person temp = myArray[i];
+            myArray[i] = myArray[smallestNow];
+            myArray[smallestNow] = temp;
+        }
+    }
+    return myArray;
+}
+
+/*
+ //Insertion Sort
+ vector <Person> insertionSort(vector <Person> myArray){
+ for(int i = 1; i <= myArray.size(); i++ ){
+ for(int j = i - 1 ; j > 0; j--){
+ if(myArray[j-1].age() > myArray[j].age()){
+ //Swap
+ Person temp = myArray[j];
+ myArray[j] = myArray[j-1];
+ myArray[j-1] = temp;
+ }
+ }
+ }
+ return myArray;
+ }
+ */
+
+vector <Person> insertionSort(vector <Person> myArray){
+    for(int i = 1; i < myArray.size(); i++){
+        int j=i;
+        while(j > 0 && myArray[j].age() < myArray[j-1].age()){
+            //Swap
+            Person temp = myArray[j];
+            myArray[j] = myArray[j-1];
+            myArray[j-1] = temp;
+            j--;
+        }
+    }
+    return myArray;
+}
 
 //Bubble Sort
 vector <Person> bubbleSort(vector <Person> myArray){
@@ -374,36 +434,6 @@ vector <Person> bubbleSort(vector <Person> myArray){
                 myArray[i-1] = temp;
             }
         }
-    }
-    return myArray;
-}
-
-//Insertion Sort
-vector <Person> insertionSort(vector <Person> myArray){
-    for(int i = 0; i <= myArray.size(); i++ ){
-        for(int j = i - 1 ; j > 0; j--){
-            if(myArray[j-1].age() > myArray[j].age()){
-                //Swap
-                Person temp = myArray[j];
-                myArray[j] = myArray[j-1];
-                myArray[j-1] = temp;
-            }
-        }
-    }
-    return myArray;
-}
-
-//Selection Sort
-vector <Person> selectionSort(vector <Person> myArray){
-    int i, j, smallestNow;
-    for(i=0; i<myArray.size()-1; i++){
-        smallestNow = i;
-        for(j=i+1; j<myArray.size(); j++){
-            if(myArray[smallestNow].age() > myArray[j].age()) smallestNow=j;
-        }
-        Person temp = myArray[i];
-        myArray[i] = myArray[smallestNow];
-        myArray[smallestNow] = temp;
     }
     return myArray;
 }
@@ -430,6 +460,20 @@ vector <Person> shakerSort(vector <Person> myArray){
     return myArray;
 }
 
+vector <Person> reduceVectorSize(vector <Person> people, int reduceAmount){
+    
+    //Check if the vector can be reduced by a certain size
+    if (people.size() > reduceAmount){
+        people.resize(people.size() - reduceAmount);
+        people.shrink_to_fit();
+        return people;
+        
+    }else{
+        //Cannot reduce further. return the original vector
+        return people;
+    }
+}
+
 double getCPUTime(void) {
     struct timeval tv;
     struct rusage ru;
@@ -441,30 +485,21 @@ double getCPUTime(void) {
     return t;
 }
 
-//Results look like this
-//Print 1000 SelectAve  InsertAve BubbleAve ShakerAve
-//Print 2000 SelectAve  InsertAve BubbleAve ShakerAve
-//Print 3000 SelectAve  InsertAve BubbleAve ShakerAve
-//Print 5000 SelectAve  InsertAve BubbleAve ShakerAve
-//Print 10000 SelectAve  InsertAve BubbleAve ShakerAve
-//Print 20000 SelectAve  InsertAve BubbleAve ShakerAve
-
+//Run Sorts three times and take average of the runs
 void runSort(vector<Person> people, SortType sortType){
     
     double startTime, endTime, totalTime;
-    double average = 0;
+    double average=0.;
     int numberOfRuns = 3;
-
+    
     for(int i = 0; i< numberOfRuns; i++){
         startTime = getCPUTime();
-        
         switch (sortType) {
             case SelectionSortType:
-                //Our Code Goes here for Selection Sort
+                //Code Goes here for Selection Sort
                 //cout << "Selection Sort: " << endl;
                 selectionSort(people);
                 break;
-                
             case InsertionSortType:
                 //cout << "Insertion Sort: " << endl;
                 insertionSort(people);
@@ -473,15 +508,12 @@ void runSort(vector<Person> people, SortType sortType){
                 //cout << "Bubble Sort: " << endl;
                 bubbleSort(people);
                 break;
-                
             case ShakerSortType:
                 //cout << "Shaker Sort: " << endl;
                 shakerSort(people);
                 break;
-                
             default:
                 //This gets trigger if SortType
-                
                 break;
         }
         endTime = getCPUTime();
@@ -504,12 +536,12 @@ void runSort(vector<Person> people, SortType sortType){
         case ShakerSortType:
             cout << "Shaker Sort ";
             break;
-            
         default:
             //This gets trigger if SortType is out of range
             break;
     }
-    cout << "is " << average << " for "<< people.size() <<  " records." << endl;
+    //cout << "is " << average << " for "<< people.size() <<  " records." << endl;
+    cout << "is " << average << endl;
 }
 
 vector <Person> reversePeopleVector(vector<Person> people){
@@ -517,11 +549,11 @@ vector <Person> reversePeopleVector(vector<Person> people){
     for (int j = int(people.size() - 1); j >= 0; j--){
         reversePeopleVector.push_back(people[j]);
     }
-    return reversePeopleVector;
+    people=reversePeopleVector;
+    return people;
 }
 
 void runAllSortsForDatabase(vector<Person> people){
-    
     cout << endl << "** Running sorts for " << people.size() << " records." << endl;
     runSort(people, SelectionSortType);
     runSort(people, InsertionSortType);
@@ -529,22 +561,21 @@ void runAllSortsForDatabase(vector<Person> people){
     runSort(people, ShakerSortType);
 }
 
-
 void runSortAveBestWorst(vector<Person> people, SortType sortType){
-
+    
     vector <Person> sortedData;
     double startTime, endTime, totalTime;
     double aveCaseTime, bestCaseTime, worstCaseTime;
+    
     //Run Average Case
-
+    //Sort the Unsorted Data
     startTime = getCPUTime();
     switch (sortType) {
         case SelectionSortType:
-            //Our Code Goes here for Selection Sort
+            //Code for Selection Sort
             //cout << "Selection Sort: " << endl;
             sortedData = selectionSort(people);
             break;
-            
         case InsertionSortType:
             //cout << "Insertion Sort: " << endl;
             sortedData = insertionSort(people);
@@ -553,30 +584,27 @@ void runSortAveBestWorst(vector<Person> people, SortType sortType){
             //cout << "Bubble Sort: " << endl;
             sortedData = bubbleSort(people);
             break;
-            
         case ShakerSortType:
             //cout << "Shaker Sort: " << endl;
             sortedData = shakerSort(people);
             break;
-            
         default:
             //This gets trigger if SortType
-            
             break;
     }
     endTime = getCPUTime();
     totalTime = endTime - startTime;
     aveCaseTime = totalTime;
-
+    
     //Best Case
+    //Sort the Sorted
     startTime = getCPUTime();
     switch (sortType) {
         case SelectionSortType:
-            //Our Code Goes here for Selection Sort
+            //Code Goes here for Selection Sort
             //cout << "Selection Sort: " << endl;
             selectionSort(sortedData);
             break;
-            
         case InsertionSortType:
             //cout << "Insertion Sort: " << endl;
             insertionSort(sortedData);
@@ -585,23 +613,18 @@ void runSortAveBestWorst(vector<Person> people, SortType sortType){
             //cout << "Bubble Sort: " << endl;
             bubbleSort(sortedData);
             break;
-            
         case ShakerSortType:
             //cout << "Shaker Sort: " << endl;
             shakerSort(sortedData);
             break;
-            
         default:
             //This gets trigger if SortType
-            
             break;
     }
     endTime = getCPUTime();
     totalTime = endTime - startTime;
     bestCaseTime = totalTime;
-
     
-
     //Worst Case
     //Reverse the SORTED People Vector
     vector<Person> reverseSortedPeople = reversePeopleVector(people);
@@ -609,11 +632,10 @@ void runSortAveBestWorst(vector<Person> people, SortType sortType){
     startTime = getCPUTime();
     switch (sortType) {
         case SelectionSortType:
-            //Our Code Goes here for Selection Sort
+            //Code Goes here for Selection Sort
             //cout << "Selection Sort: " << endl;
             sortedData = selectionSort(reverseSortedPeople);
             break;
-            
         case InsertionSortType:
             //cout << "Insertion Sort: " << endl;
             sortedData = insertionSort(reverseSortedPeople);
@@ -622,15 +644,12 @@ void runSortAveBestWorst(vector<Person> people, SortType sortType){
             //cout << "Bubble Sort: " << endl;
             sortedData = bubbleSort(reverseSortedPeople);
             break;
-            
         case ShakerSortType:
             //cout << "Shaker Sort: " << endl;
             sortedData = shakerSort(reverseSortedPeople);
             break;
-            
         default:
             //This gets trigger if SortType
-            
             break;
     }
     endTime = getCPUTime();
@@ -651,23 +670,53 @@ void runSortAveBestWorst(vector<Person> people, SortType sortType){
         case ShakerSortType:
             cout << "Shaker Sort ";
             break;
-            
         default:
             //This gets trigger if SortType is out of range
             break;
     }
-    cout << " for "<< people.size() <<  " records:";
-    //cout << " AverageCase: " << aveCaseTime << endl;
-    //cout << " BestCase: " << bestCaseTime << endl;
-    //cout << " WorstCase: " << worstCaseTime << endl;
+    //cout << " for "<< people.size() <<  " records:"<< endl;
+    cout << endl;
+    cout << " Sort unsorted data (Ave): " << aveCaseTime << endl;
+    cout << " Sort sorted data (Best): " << bestCaseTime << endl;
+    cout << " Sort sorted data to opposite order (Worse): " << worstCaseTime << endl;
     
-    
-    cout << " \t" << aveCaseTime << " \t " << bestCaseTime << " \t"<< worstCaseTime << endl;
-    
-    
-    
+    //cout << " \t \t " << aveCaseTime << " \t " << bestCaseTime << " \t"<< worstCaseTime << endl;
 }
 
+
+double runTimedSort(vector<Person> people, SortType sortType){
+    double startTime, endTime, totalTime;
+
+    
+    //Run Average Case
+    //Sort the Unsorted Data
+    startTime = getCPUTime();
+    switch (sortType) {
+        case SelectionSortType:
+            //Code for Selection Sort
+            //cout << "Selection Sort: " << endl;
+            selectionSort(people);
+            break;
+        case InsertionSortType:
+            //cout << "Insertion Sort: " << endl;
+            insertionSort(people);
+            break;
+        case BubbleSortType:
+            //cout << "Bubble Sort: " << endl;
+            bubbleSort(people);
+            break;
+        case ShakerSortType:
+            //cout << "Shaker Sort: " << endl;
+            shakerSort(people);
+            break;
+        default:
+            //This gets trigger if SortType
+            break;
+    }
+    endTime = getCPUTime();
+    totalTime = endTime - startTime;
+    return totalTime;
+}
 
 void runAllSortsForDatabaseForAveBestWorst(vector<Person> people){
     
@@ -678,10 +727,99 @@ void runAllSortsForDatabaseForAveBestWorst(vector<Person> people){
     runSortAveBestWorst(people, ShakerSortType);
 }
 
+void runGranularSorts(vector <Person> people, SortType sortType, int reduceAmount){
 
+
+    vector<double> sizes;
+    vector<double> results;
+    
+    
+    double runTime;
+    
+    while (people.size() > reduceAmount +1){
+        
+        runTime = runTimedSort(people, sortType);
+        sizes.push_back(people.size());
+        results.push_back(runTime);
+        
+        people = reduceVectorSize(people, reduceAmount);
+        
+    }
+    
+    
+
+    //Print Results
+    for (int i = (int)results.size() - 1; i > 0; i--){
+        cout << results[i] << "\t";
+    }
+    cout << endl;
+    
+}
+
+void printVectorSizes(vector <Person> people,  int reduceAmount){
+    
+    
+    vector<double> sizes;
+    while (people.size() > reduceAmount +1){
+        sizes.push_back(people.size());
+        people = reduceVectorSize(people, reduceAmount);
+    }
+
+    for (int i = (int)sizes.size() - 1; i > 0 ; i--){
+        cout << sizes[i] << "\t";
+    }
+    cout << endl;
+}
+
+void runAllCasesGranular(vector<Person> people, SortType sortType){
+    
+    
+    int reduceAmount = 500;
+    printVectorSizes(people, reduceAmount);
+    //Run Ave Case
+
+    runGranularSorts(people, sortType, reduceAmount);
+    //Run Best Case
+    vector<Person>bestCase = selectionSort(people);
+    runGranularSorts(people, sortType, reduceAmount);
+
+    //run Worst Case
+    vector<Person>worstCase = reversePeopleVector(bestCase);
+    runGranularSorts(worstCase, sortType, reduceAmount);
+    
+}
+
+void runAllSortTypeGranular(vector<Person> people){
+    
+    //cout << "Selection: " << endl;
+    //runAllCasesGranular(people, SelectionSortType);
+
+    //cout << "Insertion: " << endl;
+    //runAllCasesGranular(people, InsertionSortType);
+
+    cout << "Bubble: " << endl;
+    runAllCasesGranular(people, BubbleSortType);
+
+    cout << "Shaker: " << endl;
+    runAllCasesGranular(people, ShakerSortType);
+}
+
+void runGranularAlgoDebug(){
+
+    //Load Largest DB
+    vector <Person> peopleVectorDB20 = readFile("/Users/cj/Desktop/database20.txt");
+    runAllSortTypeGranular(peopleVectorDB20);
+}
+
+void printSorted(vector<Person> people){
+    
+    for (int i = 0; i < people.size(); i++){
+        
+        cout << people[i].age() << endl;
+    }
+}
 
 void labTwo(){
-    
     cout << endl;
     cout <<"**************************************************************"<< endl;
     cout << "  Part 1: Reading files and Printing database1.txt with " << endl;
@@ -689,13 +827,13 @@ void labTwo(){
     cout <<"**************************************************************"<< endl;
     
     vector <Person> peopleVectorDB1 = readFile("/Users/cj/Desktop/database1.txt");
-    //printPeopleVector(peopleVectorDB1);
+    printPeopleVector(peopleVectorDB1);
     vector <Person> peopleVectorDB2 = readFileByLine("/Users/cj/Desktop/database2.txt");
     vector <Person> peopleVectorDB3 = readFile("/Users/cj/Desktop/database3.txt");
     vector <Person> peopleVectorDB5 = readFile("/Users/cj/Desktop/database5.txt");
     vector <Person> peopleVectorDB10 = readFile("/Users/cj/Desktop/database10.txt");
     vector <Person> peopleVectorDB20 = readFile("/Users/cj/Desktop/database20.txt");
-
+    
     cout << endl;
     cout <<"*****************************************************************"<< endl;
     cout << "  Part 2: Sorting Six Data Files via Four Different Algorithms." << endl;
@@ -707,11 +845,14 @@ void labTwo(){
     runAllSortsForDatabase(peopleVectorDB5);
     runAllSortsForDatabase(peopleVectorDB10);
     runAllSortsForDatabase(peopleVectorDB20);
-
+    
     cout << endl;
-    cout <<"*****************************************************************"<< endl;
-    cout << "  Part 3: Sorting Six Data Files via Four Different Algorithms in Average, Best and Worst Case." << endl;
-    cout <<"*****************************************************************"<< endl;
+    cout << "*****************************************************************"<< endl;
+    cout << "                       Extra Credit" << endl;
+    cout << "Part 3: Sorting Six Data Files via Four Different Algorithms for" << endl;
+    cout << "        Sort Unsorted Data (Average), Sort Sorted Data (Best)" << endl;
+    cout << "        and Sort Unsorted Opposite Date (Worst) Cases." << endl;
+    cout << "*****************************************************************"<< endl;
     
     runAllSortsForDatabaseForAveBestWorst(peopleVectorDB1);
     runAllSortsForDatabaseForAveBestWorst(peopleVectorDB2);
@@ -719,12 +860,14 @@ void labTwo(){
     runAllSortsForDatabaseForAveBestWorst(peopleVectorDB5);
     runAllSortsForDatabaseForAveBestWorst(peopleVectorDB10);
     runAllSortsForDatabaseForAveBestWorst(peopleVectorDB20);
-
+    
 }
 
 int main(int argc, const char * argv[]){
-    cout << "Lab 2, Parts 1 and 2 \n";
-    labTwo();
+    cout << "Lab 2, Parts 1, 2, and Extra Credit \n";
+    //labTwo();
+    
+    runGranularAlgoDebug();
     return 0;
 }
 
