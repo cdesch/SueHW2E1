@@ -11,11 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sstream>
-
+#include <thread>
 using namespace std;
 //              {0,                 1,                          2,          3};
 enum SortType {SelectionSortType, InsertionSortType, BubbleSortType, ShakerSortType};
-
 
 int randomNumberUnder(unsigned long maxVal){
     return  rand() % maxVal;
@@ -549,7 +548,7 @@ vector <Person> reversePeopleVector(vector<Person> people){
     for (int j = int(people.size() - 1); j >= 0; j--){
         reversePeopleVector.push_back(people[j]);
     }
-    people=reversePeopleVector;
+    people = reversePeopleVector;
     return people;
 }
 
@@ -687,7 +686,6 @@ void runSortAveBestWorst(vector<Person> people, SortType sortType){
 double runTimedSort(vector<Person> people, SortType sortType){
     double startTime, endTime, totalTime;
 
-    
     //Run Average Case
     //Sort the Unsorted Data
     startTime = getCPUTime();
@@ -727,13 +725,9 @@ void runAllSortsForDatabaseForAveBestWorst(vector<Person> people){
     runSortAveBestWorst(people, ShakerSortType);
 }
 
-void runGranularSorts(vector <Person> people, SortType sortType, int reduceAmount){
-
-
+vector <double> runGranularSorts(vector <Person> people, SortType sortType, int reduceAmount){
     vector<double> sizes;
     vector<double> results;
-    
-    
     double runTime;
     
     while (people.size() > reduceAmount +1){
@@ -741,23 +735,16 @@ void runGranularSorts(vector <Person> people, SortType sortType, int reduceAmoun
         runTime = runTimedSort(people, sortType);
         sizes.push_back(people.size());
         results.push_back(runTime);
-        
         people = reduceVectorSize(people, reduceAmount);
         
     }
     
     
-
-    //Print Results
-    for (int i = (int)results.size() - 1; i > 0; i--){
-        cout << results[i] << "\t";
-    }
-    cout << endl;
+    return results;
     
 }
 
 void printVectorSizes(vector <Person> people,  int reduceAmount){
-    
     
     vector<double> sizes;
     while (people.size() > reduceAmount +1){
@@ -771,52 +758,112 @@ void printVectorSizes(vector <Person> people,  int reduceAmount){
     cout << endl;
 }
 
+
+void printSortName(SortType sortType){
+    
+    switch (sortType) {
+        case SelectionSortType:
+            cout << "Selection Sort ";
+            break;
+        case InsertionSortType:
+            cout << "Insertion Sort ";
+            break;
+        case BubbleSortType:
+            cout << "Bubble Sort ";
+            break;
+        case ShakerSortType:
+            cout << "Shaker Sort ";
+            break;
+        default:
+            //This gets trigger if SortType is out of range
+            break;
+    }
+    cout << endl;
+    
+}
+
+void printResults(vector<double> results){
+    
+    //Print Results
+    for (int i = (int)results.size() - 1; i > 0; i--){
+        cout << results[i] << "\t";
+    }
+    cout << endl;
+}
+
 void runAllCasesGranular(vector<Person> people, SortType sortType){
     
     
     int reduceAmount = 500;
-    printVectorSizes(people, reduceAmount);
+
     //Run Ave Case
 
-    runGranularSorts(people, sortType, reduceAmount);
+    vector <double> aveCaseResults = runGranularSorts(people, sortType, reduceAmount);
     //Run Best Case
     vector<Person>bestCase = selectionSort(people);
-    runGranularSorts(people, sortType, reduceAmount);
+    vector <double> bestCaseResults = runGranularSorts(people, sortType, reduceAmount);
 
     //run Worst Case
     vector<Person>worstCase = reversePeopleVector(bestCase);
-    runGranularSorts(worstCase, sortType, reduceAmount);
+    vector <double> worstCaseResults = runGranularSorts(worstCase, sortType, reduceAmount);
     
+    printSortName(sortType);
+    printVectorSizes(people, reduceAmount);
+    printResults(aveCaseResults);
+    printResults(bestCaseResults);
+    printResults(worstCaseResults);
+
 }
 
-void runAllSortTypeGranular(vector<Person> people){
-    
-    //cout << "Selection: " << endl;
-    //runAllCasesGranular(people, SelectionSortType);
+void runAllSortTypeGranular(vector<Person> people, bool isMultiThreaded){
+    //Should we run as multiThreaded?
+    if(isMultiThreaded){
+        //Multi threaded
+        thread selectionThread(runAllCasesGranular, people, SelectionSortType);
+        thread insertionThread(runAllCasesGranular, people, InsertionSortType);
+        thread bubbleThread(runAllCasesGranular, people, BubbleSortType);
+        thread shakerThread(runAllCasesGranular, people, ShakerSortType);
+        
+        //Wait until all threads finish
+        selectionThread.join();
+        insertionThread.join();
+        bubbleThread.join();
+        shakerThread.join();
+    }else{
+        //Single Threaded
+        runAllCasesGranular(people, SelectionSortType);
+        runAllCasesGranular(people, InsertionSortType);
+        runAllCasesGranular(people, BubbleSortType);
+        runAllCasesGranular(people, ShakerSortType);
 
-    //cout << "Insertion: " << endl;
-    //runAllCasesGranular(people, InsertionSortType);
-
-    cout << "Bubble: " << endl;
-    runAllCasesGranular(people, BubbleSortType);
-
-    cout << "Shaker: " << endl;
-    runAllCasesGranular(people, ShakerSortType);
+    }
 }
+
+
 
 void runGranularAlgoDebug(){
 
     //Load Largest DB
     vector <Person> peopleVectorDB20 = readFile("/Users/cj/Desktop/database20.txt");
-    runAllSortTypeGranular(peopleVectorDB20);
+    
+    bool runMultiThreaded = true;
+    runAllSortTypeGranular(peopleVectorDB20, runMultiThreaded);
 }
 
 void printSorted(vector<Person> people){
-    
     for (int i = 0; i < people.size(); i++){
-        
         cout << people[i].age() << endl;
     }
+}
+
+void testSort(){
+    vector <Person> peopleVectorDB1 = readFile("/Users/cj/Desktop/database1.txt");
+    vector <Person> people = selectionSort(peopleVectorDB1);
+    printSorted(people);
+    people  = reversePeopleVector(people);
+    cout << "reverse" << endl;
+    
+    printSorted(people);
 }
 
 void labTwo(){
@@ -867,7 +914,8 @@ int main(int argc, const char * argv[]){
     cout << "Lab 2, Parts 1, 2, and Extra Credit \n";
     //labTwo();
     
-    runGranularAlgoDebug();
+//    runGranularAlgoDebug();
+    testSort();
     return 0;
 }
 
