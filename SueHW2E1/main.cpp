@@ -449,32 +449,42 @@ vector <Person> selectionSort(vector <Person> myArray){
  */
 
 vector <Person> insertionSort(vector <Person> myArray){
-    for(int i = 0; i < myArray.size()-1; i++){
-        int j=i +1;
+    for(int i = 1; i < myArray.size(); i++){
+        int j = i;
 
-        Person temp = myArray[j];
-        while(j > 0 && temp.age() > myArray[j-1].age()){
+
+        while(j > 0 && myArray[j].age() < myArray[j-1].age()){
             //Swap
+
+            Person temp = myArray[j];
             myArray[j] = myArray[j-1];
+            myArray[j-1] = temp;
             j--;
         }
-        myArray[j-1] = temp;
+
     }
     return myArray;
 }
+
 
 //Bubble Sort
 vector <Person> bubbleSort(vector <Person> myArray){
     //Loop through
     //Compare and swap ...
+    int swaps = 0;
     for(int loop = 0; loop < myArray.size()-1; loop++ ){
-        for(int i = 0 ; i <myArray.size() - loop - 1; i++){
-            if(myArray[i+1].age() > myArray[i].age()){
+        swaps = 0;
+        for(int i = 0 ; i < myArray.size() - loop - 1; i++){
+            if(myArray[i+1].age() < myArray[i].age()){
                 //Swap
                 Person temp = myArray[i];
                 myArray[i] = myArray[i+1];
                 myArray[i+1] = temp;
+                swaps ++;
             }
+        }
+        if (swaps == 0) {
+            break;
         }
     }
     return myArray;
@@ -791,9 +801,7 @@ void printProgBar( int percent ){
     cout<< percent << "%     " << std::flush;
 }
 
-
 int calcPercentage(float num,float dom){
-    
     return (int) (num/dom) * 100;
 }
 
@@ -917,10 +925,10 @@ void runAllSortTypeGranular(vector<Person> people, bool isMultiThreaded){
         
     }else{
         //Single Threaded
-        //runAllCasesGranular(people, SelectionSortType);
-        //runAllCasesGranular(people, InsertionSortType);
-        //runAllCasesGranular(people, BubbleSortType);
-        //runAllCasesGranular(people, ShakerSortType);
+        runAllCasesGranular(people, SelectionSortType);
+        runAllCasesGranular(people, InsertionSortType);
+        runAllCasesGranular(people, BubbleSortType);
+        runAllCasesGranular(people, ShakerSortType);
 
     }
 }
@@ -932,7 +940,7 @@ void runGranularAlgoDebug(){
     //Load Largest DB
     vector <Person> peopleVectorDB20 = readFile("/Users/cj/Desktop/database20.txt");
     
-    bool runMultiThreaded = true;
+    bool runMultiThreaded = false;
     runAllSortTypeGranular(peopleVectorDB20, runMultiThreaded);
 }
 
